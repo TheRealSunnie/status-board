@@ -5,13 +5,6 @@ export function handleAuthClick(event) {
   window.gapi.auth2.getAuthInstance().signIn();
 }
 
-/**
- *  Sign out the user upon button click.
- */
-function handleSignoutClick(event) {
-  window.gapi.auth2.getAuthInstance().signOut();
-}
-
 const days = [
   "Sunday",
   "Monday",

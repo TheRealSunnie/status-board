@@ -38,6 +38,31 @@ function App() {
   const [isSignedIn, setIsSignedin] = useState(false);
   const [chores, setChores] = useState([]);
 
+  const onClickGetData = useCallback(() => {
+    window.gapi.client.sheets.spreadsheets.values
+      .get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: getDayOfTheWeek() + "!A1:N"
+      })
+
+      .then(response => {
+        const [chores, ...assignments] = response.result.values;
+        const chorelist = [];
+
+        chores.forEach(function(chore, index) {
+          if (chore === "") return; // if not true -> return to loop
+          chorelist.push({
+            name: chore,
+            assignees: getAssigneesForChore(assignments, index)
+          });
+        });
+        setChores(chorelist);
+      })
+      .catch(error => {
+        console.log("error", error);
+      });
+  }, []);
+
   useEffect(() => {
     window.gapi.load("client:auth2", () => {
       window.gapi.client
@@ -64,32 +89,7 @@ function App() {
           }
         );
     });
-  }, []);
-
-  const onClickGetData = useCallback(() => {
-    window.gapi.client.sheets.spreadsheets.values
-      .get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: getDayOfTheWeek() + "!A1:N"
-      })
-
-      .then(response => {
-        const [chores, ...assignments] = response.result.values;
-        const chorelist = [];
-
-        chores.forEach(function(chore, index) {
-          if (chore === "") return; // if not true -> return to loop
-          chorelist.push({
-            name: chore,
-            assignees: getAssigneesForChore(assignments, index)
-          });
-        });
-        setChores(chorelist);
-      })
-      .catch(error => {
-        console.log("error", error);
-      });
-  }, []);
+  }, [onClickGetData]);
 
   return (
     <Section>
